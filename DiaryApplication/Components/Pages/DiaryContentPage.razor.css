@@ -1,0 +1,30 @@
+﻿table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th.date, td.date {
+     text-align: center;
+     width: 10%;
+}
+
+th.content, td.content {
+     width: 80%;
+}
+
+th.action, td.action {
+     width: 10%;
+     text-align: center;
+}

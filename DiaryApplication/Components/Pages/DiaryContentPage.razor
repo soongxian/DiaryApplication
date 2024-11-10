@@ -1,0 +1,58 @@
+﻿@page "/diarycontent"
+@inject IDiaryContentService DiaryContentService
+@inject NavigationManager NavigationManager
+@attribute [StreamRendering]
+@rendermode @(new InteractiveServerRenderMode(prerender: true))
+
+<h3>Content</h3>
+<CreateDiaryContentButton/>
+
+@if (diaryContents == null)
+{
+    <span>Loading...</span>
+}
+else if (diaryContents.Count == 0)
+{
+    <span>No diaryContents found.</span>
+} 
+else
+{
+    <table>
+        <tr>
+            <th class="date">Date</th>
+            <th class="content">Content</th>
+            <th class="action">Action</th>
+        </tr>
+        @foreach (var content in diaryContents)
+        {
+            <tr>
+                <td class="date">@content.Date.ToString("yyyy-MM-dd")</td>
+                <td class="content">@content.Content</td>
+                <td class="action">
+                    <EditDiaryContentButton id="@content.Id" />
+                    <DeleteDiaryContentButton id="@content.Id" OnContentDeleted="RefreshContentList" />
+                    </td>
+            </tr>
+        }
+    </table>
+}
+
+@code {
+    List<DiaryApplication.Shared.Entity.DiaryContent>? diaryContents = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDiaryContents();
+    }
+
+    protected async Task LoadDiaryContents()
+    {
+        diaryContents = await DiaryContentService.GetAllDiaryContent();
+    }
+
+    protected async Task RefreshContentList()
+    {
+        await LoadDiaryContents();
+    }
+
+}

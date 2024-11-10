@@ -1,0 +1,14 @@
+﻿table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td.title {
+    width: 10%;
+    text-align: left;
+}
+
+td.details {
+    width: 90%;
+    text-align: left;
+}

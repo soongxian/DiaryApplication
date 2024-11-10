@@ -1,0 +1,11 @@
+﻿@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<button @onclick="CreateNewContent" class="btn btn-primary">Create New Diary</button>
+
+@code {
+    void CreateNewContent()
+    {
+        NavigationManager.NavigateTo("/create_edit_diary_content");
+    }
+}

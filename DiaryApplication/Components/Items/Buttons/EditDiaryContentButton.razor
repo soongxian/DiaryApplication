@@ -1,0 +1,14 @@
+﻿@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<button @onclick="EditDiaryContent" class="btn btn-primary">Edit</button>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    void EditDiaryContent()
+    {
+        NavigationManager.NavigateTo($"/create_edit_diary_content/{Id}");
+    }
+}

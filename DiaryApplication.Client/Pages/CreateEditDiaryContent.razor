@@ -1,0 +1,125 @@
+﻿@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: true))
+@page "/create_edit_diary_content"
+@page "/create_edit_diary_content/{id:int}"
+@inject IDiaryContentService diaryContentService
+@inject NavigationManager NavigationManager
+
+@if (Id == null)
+{
+    <h3>Create New Diary Content</h3>
+}
+else
+{
+    <h3>Modify Diary Content Date: @diaryContent.Date.ToString("yyyy-MM-dd")</h3>
+}
+
+<EditForm Model="diaryContent" OnSubmit="HandleSubmit" FormName="createEditForm">
+    <table>
+        <tr>
+            <td class="title">
+                <label>Date</label>
+            </td>
+            <td class="details">
+                <InputDate @bind-Value="diaryContent.Date" />
+            </td>
+        </tr>
+        <tr>
+            <td class="title">
+                <label>Diary Content</label>
+            </td>
+            <td class="details">
+                <InputText @bind-Value="diaryContent.Content"
+                           class="large-input"
+                           title="Enter your diary content here"
+                           placeholder="Write your diary content here..."
+                           style="width: 100%;" />
+            </td>
+        </tr>
+        <tr>
+            <td class="title" />
+            <td class="details">
+                <button type="submit" class="btn btn-primary" disabled="@isLoading">Submit</button>
+            </td>
+        </tr>
+    </table>
+</EditForm>
+
+@if (isLoading)
+{
+    <div class="loading-overlay">
+        <p>Loading, please wait...</p>
+    </div>
+}
+
+@if (showSuccessPopup)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Success</h5>
+                    <button type="button" class="close" @onclick="ClosePopup">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Diary content has been successfully @successMessage.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" @onclick="ClosePopup">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+    [SupplyParameterFromForm]
+    private DiaryContent diaryContent { get; set; } = new DiaryContent { Date = DateTime.Now, Content = string.Empty };
+
+    private bool isLoading = false;
+    private bool showSuccessPopup = false;
+    private string successMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            diaryContent = await diaryContentService.GetDiaryContentById((int)Id);
+        }
+    }
+
+    private void ClosePopup()
+    {
+        showSuccessPopup = false;
+        NavigationManager.NavigateTo("/diarycontent");
+    }
+
+    private async Task HandleSubmit()
+    {
+        isLoading = true;  // Show loading indicator
+        try
+        {
+            if (Id == null)
+            {
+                await diaryContentService.AddContent(diaryContent);
+                successMessage = "added";
+            }
+            else
+            {
+                await diaryContentService.EditDiaryContent((int)Id, diaryContent);
+                successMessage = "modified";
+            }
+
+            showSuccessPopup = true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;  // Hide loading indicator
+        }
+    }
+}
